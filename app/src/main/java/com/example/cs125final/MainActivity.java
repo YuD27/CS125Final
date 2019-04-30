@@ -9,7 +9,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,12 +16,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
-
-    String API_KEY = "8190df9eb51445228e397e4185311a66";
+    String API_KEY = "5d291f9fc3694a00bbac1e3c18cb1bf9";
     String NEWS_SOURCE = "bbc-news";
     ListView listNews;
     ProgressBar loader;
-
     ArrayList<HashMap<String, String>> dataList = new ArrayList<HashMap<String, String>>();
     static final String authorName = "author";
     static final String title = "title";
@@ -31,40 +28,41 @@ public class MainActivity extends AppCompatActivity {
     static final String urlToImage = "urlToImage";
     static final String publishedAt = "publishedAt";
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         listNews = (ListView) findViewById(R.id.listNews);
         loader = (ProgressBar) findViewById(R.id.loader);
         listNews.setEmptyView(loader);
-
-        if(Functions.isNetworkAvailable(getApplicationContext()))
-        {
+        //Check if online
+        if (Functions.isNetworkAvailable(getApplicationContext())) {
             DownloadNews newsTask = new DownloadNews();
             newsTask.execute();
-        }else{
+        } else {
             Toast.makeText(getApplicationContext(), "No Internet Connection", Toast.LENGTH_LONG).show();
         }
+
     }
 
     class DownloadNews extends AsyncTask<String, Void, String> {
-        @Override
         protected void onPreExecute() {
             super.onPreExecute();
         }
+
+        // Get json with NEWS API
         protected String doInBackground(String... args) {
-            String xml = "";
+            String json = "";
             String urlParameters = "";
-            xml = Functions.excuteGet("https://newsapi.org/v1/articles?source=" + NEWS_SOURCE + "&sortBy=top&apiKey=" + API_KEY, urlParameters);
-            return xml;
+            json = Functions.executeGet("https://newsapi.org/v1/articles?source="
+                    + NEWS_SOURCE + "&sortBy=top&apiKey=" + API_KEY, urlParameters);
+            return json;
         }
-        @Override
-        protected void onPostExecute(String xml) {
-            if (xml.length() > 10) {
+
+        protected void onPostExecute(String json) {
+            if (json.length() > 10) {
                 try {
-                    JsonObject jsonResponse = new JsonParser().parse(xml).getAsJsonObject();
+                    // Parse json w/ google Gson and turn it into a hashmap
+                    JsonObject jsonResponse = new JsonParser().parse(json).getAsJsonObject();
                     JsonArray jsonArray = jsonResponse.getAsJsonArray("articles");
                     for (int i = 0; i < jsonArray.size(); i++) {
                         JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
@@ -77,11 +75,14 @@ public class MainActivity extends AppCompatActivity {
                         map.put(publishedAt, jsonObject.get(publishedAt).getAsString());
                         dataList.add(map);
                     }
+                    // Show message w/ toast when exception is caught
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), "Unexpected error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Unexpected error",
+                            Toast.LENGTH_SHORT).show();
                 }
-                ListNewsAdapter adapter = new ListNewsAdapter(MainActivity.this, dataList);
-                listNews.setAdapter(adapter);
+                // Show in the listView
+                ListNewsAdapter listNewsAdapter = new ListNewsAdapter(MainActivity.this, dataList);
+                listNews.setAdapter(listNewsAdapter);
                 listNews.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Intent i = new Intent(MainActivity.this, DetailsActivity.class);
@@ -90,7 +91,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             } else {
-                Toast.makeText(getApplicationContext(), "No news found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "No news found",
+                        Toast.LENGTH_SHORT).show();
             }
         }
     }

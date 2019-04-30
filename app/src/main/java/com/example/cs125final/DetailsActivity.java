@@ -10,29 +10,29 @@ import android.widget.ProgressBar;
 
 public class DetailsActivity extends AppCompatActivity {
     WebView webView;
-    ProgressBar loader;
+    ProgressBar load;
     String url = "";
-    @Override
+    //Set up WebView and loader. Open web w/ Chrome.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
-
+        //Create Intent
         Intent intent = getIntent();
         url = intent.getStringExtra("url");
-        loader = (ProgressBar) findViewById(R.id.loader);
+        load = (ProgressBar) findViewById(R.id.loader);
         webView = (WebView) findViewById(R.id.webView);
-        webView.getSettings().setBuiltInZoomControls(true);
-        webView.getSettings().setDisplayZoomControls(false);
         webView.loadUrl(url);
+        // Call Chrome
         webView.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView view, int progress) {
+                // Finish loading -> Hide loader
+                // Else -> Show loader
                 if (progress == 100) {
-                    loader.setVisibility(View.GONE);
+                    load.setVisibility(View.GONE);
                 } else {
-                    loader.setVisibility(View.VISIBLE);
+                    load.setVisibility(View.VISIBLE);
                 }
             }
         });
-
     }
 }

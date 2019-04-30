@@ -19,7 +19,7 @@ class ListNewsAdapter extends BaseAdapter {
 
     public ListNewsAdapter(Activity a, ArrayList<HashMap<String, String>> d) {
         activity = a;
-        data=d;
+        data = d;
     }
     public int getCount() {
         return data.size();
@@ -31,15 +31,16 @@ class ListNewsAdapter extends BaseAdapter {
         return position;
     }
     public View getView(int position, View convertView, ViewGroup parent) {
+        //Set up ListView Holder
         ListNewsViewHolder holder = null;
         if (convertView == null) {
             holder = new ListNewsViewHolder();
-            convertView = LayoutInflater.from(activity).inflate(
-                    R.layout.list_row, parent, false);
+            convertView = LayoutInflater.from(activity).inflate(R.layout.list_row, parent,
+                    false);
             holder.galleryImage = (ImageView) convertView.findViewById(R.id.galleryImage);
             holder.author = (TextView) convertView.findViewById(R.id.author);
             holder.title = (TextView) convertView.findViewById(R.id.title);
-            holder.sdetails = (TextView) convertView.findViewById(R.id.sdetails);
+            holder.sdetails = (TextView) convertView.findViewById(R.id.Details);
             holder.time = (TextView) convertView.findViewById(R.id.time);
             convertView.setTag(holder);
         } else {
@@ -50,22 +51,22 @@ class ListNewsAdapter extends BaseAdapter {
         holder.title.setId(position);
         holder.sdetails.setId(position);
         holder.time.setId(position);
-
-        HashMap<String, String> song = new HashMap<String, String>();
-        song = data.get(position);
-
+        HashMap<String, String> map = new HashMap<String, String>();
+        map = data.get(position);
         try{
-            holder.author.setText(song.get(MainActivity.authorName));
-            holder.title.setText(song.get(MainActivity.title));
-            holder.time.setText(song.get(MainActivity.publishedAt));
-            holder.sdetails.setText(song.get(MainActivity.description));
-
-            if(song.get(MainActivity.urlToImage).toString().length() < 5)
+            holder.author.setText(map.get(MainActivity.authorName));
+            holder.title.setText(map.get(MainActivity.title));
+            holder.time.setText(map.get(MainActivity.publishedAt));
+            holder.sdetails.setText(map.get(MainActivity.description));
+            //Not display pic if too small, i.e. there is problem
+            if(map.get(MainActivity.urlToImage).toString().length() < 10)
             {
                 holder.galleryImage.setVisibility(View.GONE);
             }else{
+                //Fetch the pic from the map w/ Picasso
                 Picasso.with(activity)
-                        .load(song.get(MainActivity.urlToImage).toString())
+                        .load(map.get(MainActivity.urlToImage).toString())
+                        // Make the image look fine lol
                         .resize(300, 200)
                         .into(holder.galleryImage);
             }

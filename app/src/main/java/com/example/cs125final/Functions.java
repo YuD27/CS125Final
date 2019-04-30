@@ -10,48 +10,39 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Functions {
+    //Function for checking if online in MainActivity
     public static boolean isNetworkAvailable(Context context)
     {
         return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo() != null;
     }
-
-    public static String excuteGet(String targetURL, String urlParameters)
+    //Function for getting json from given url in MainActivity
+    public static String executeGet(String targetURL, String urlParameters)
     {
         URL url;
         HttpURLConnection connection = null;
         try {
-            //Create connection
             url = new URL(targetURL);
             connection = (HttpURLConnection)url.openConnection();
-            //connection.setRequestMethod("POST");
-            //connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             connection.setRequestProperty("content-type", "application/json;  charset=utf-8");
-
             connection.setRequestProperty("Content-Language", "en-US");
-
             connection.setUseCaches (false);
             connection.setDoInput(true);
             connection.setDoOutput(false);
-
-            InputStream is;
-
+            InputStream inputStream;
             int status = connection.getResponseCode();
-
             if (status != HttpURLConnection.HTTP_OK)
-                is = connection.getErrorStream();
+                inputStream = connection.getErrorStream();
             else
-                is = connection.getInputStream();
-
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                inputStream = connection.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             StringBuffer response = new StringBuffer();
-            while((line = rd.readLine()) != null) {
+            while((line = bufferedReader.readLine()) != null) {
                 response.append(line);
                 response.append('\r');
             }
-            rd.close();
+            bufferedReader.close();
             return response.toString();
-
         } catch (Exception e) {
             return null;
         } finally {
