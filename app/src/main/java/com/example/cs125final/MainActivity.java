@@ -18,7 +18,7 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    String API_KEY = "8190df9eb51445228e397e4185311a66"; // ### YOUE NEWS API HERE ###
+    String API_KEY = "8190df9eb51445228e397e4185311a66";
     String NEWS_SOURCE = "bbc-news";
     ListView listNews;
     ProgressBar loader;
